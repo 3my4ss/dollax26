@@ -1,0 +1,182 @@
+Cloudflare Worker VPN Panel — Deployment Guide (English)
+A self-contained Cloudflare Worker VPN panel that manages VLESS / VMess / Trojan (and Shadowsocks) inbounds, clients, clean IPs, per-inbound ProxyIP, subscriptions and admin permissions — all stored in a single D1 database.
+
+Storage: one D1 database bound as IOT_DB.
+No KV, no VPC, no R2, no Durable Objects, no Queues, no service bindings.
+The only platform feature used is cloudflare:sockets (built into Workers — no binding).
+1. What you get
+
+Area	Details
+Protocols	VLESS and Trojan native; VMess and Shadowsocks via the Xray WebSocket bridge
+Transports	WebSocket (ws), TLS on the 443-series ports, plain on the 80-series ports, early-data (0-RTT, ed=2560)
+Subscriptions	Generic base64 (/ty, /raw), Clash-meta (/cl), sing-box (/sb), plus a human HTML page
+Panel	Overview, Inbounds, Outbounds, Clients, Admins, Clean IPs, Settings, Logs
+Appearance	Language EN/FA (+RTL), interface style Solid/Glass, 7 theme colours — with a Save button
+Clients	Traffic quota, expiry, max IPs, per-client port selection, per-client clean-IP selection
+Inbounds	Per-inbound ProxyIP, ports, path, outbound, traffic limit, max clients
+Security	D1-backed sessions, hashed passwords, role + per-section permissions, request logging
+2. Requirements
+A Cloudflare account (free plan is enough).
+Permission to create a D1 database and a Worker.
+(Optional) A custom domain on Cloudflare — needed if you want to use a domain other than *.workers.dev.
+(Optional) An Xray server if you want VMess / Shadowsocks to work (they need the bridge).
+You do not need KV, VPC, R2, Durable Objects or any paid add-on.
+
+3. Deploy — Method A: Cloudflare Dashboard (recommended for beginners)
+Step 1 — Create the D1 database
+Cloudflare dashboard → Storage & Databases → D1 SQL Database.
+Click Create → name it e.g. vpn-panel-db → Create.
+You do not need to run any SQL. The Worker creates all tables itself.
+Step 2 — Create the Worker
+Go to Workers & Pages → Create → Worker.
+Give it a name → Deploy.
+Click Edit code.
+Step 3 — Paste the script
+Delete the default sample code.
+Paste the entire contents of worker.js.
+Click Deploy (top-right).
+Step 4 — Add the D1 binding (critical)
+In the Worker → Settings → Bindings (or Settings → Variables and Bindings).
+Add binding → D1 database.
+Variable name: IOT_DB ← must be exactly this.
+D1 database: select the database you created in Step 1.
+Save / Deploy.
+If the binding name is not IOT_DB, the panel returns D1 binding IOT_DB is missing.
+
+Step 5 — First run and login
+Open https://<your-worker>.workers.dev/dashboard (the root / redirects there).
+Log in with the default owner account:
+Username: dollax26
+Password: dollax26
+Change the password immediately: Settings → Panel Settings → New password → Save settings.
+The script forces this default once on the first run after this build (owner_reset_v1), so a locked-out owner can always get back in. After you change the password it will not be reset again.
+
+The first request creates the schema and the default inbounds/outbounds automatically.
+
+Step 6 — (Optional) Custom domain
+Worker → Settings → Domains & Routes → Add → Custom domain.
+Pick a domain you own on Cloudflare. With a custom domain you can use the 443-series (TLS) ports; the 80-series (plain) ports are reachable on the *.workers.dev domain.
+4. Deploy — Method B: Wrangler CLI
+Prerequisites: Node.js 18+ and npm i -g wrangler, then wrangler login.
+
+bash
+复制
+# 1. Create the D1 database and copy its database_id from the output
+wrangler d1 create vpn-panel-db
+
+# 2. Project files
+mkdir vpn-panel && cd vpn-panel
+# put worker.js in this folder
+Create wrangler.toml:
+
+toml
+复制
+name = "vpn-panel"
+main = "worker.js"
+compatibility_date = "2025-01-01"   # any recent date is fine
+
+[[d1_databases]]
+binding = "IOT_DB"                   # must be exactly IOT_DB
+database_name = "vpn-panel-db"
+database_id = "<paste-the-id-from-step-1>"
+bash
+复制
+# 3. Deploy
+wrangler deploy
+Then open https://vpn-panel.<your-subdomain>.workers.dev/dashboard and log in as above.
+
+5. Best settings (recommended configuration)
+5.1 Settings → Appearance
+Pick Language, Interface style, Theme, Corner style and Font, then press Save appearance (nothing changes until you save). For dark rooms the Glass style with Dark Cyan / Dark Blue looks best; Orange for high contrast.
+
+Corner style: Rounded (default) or Cubic (square/sharp corners).
+Font: Default plus three per language — English: Allpony, Triakis, Incorrigible; Farsi: Sheed, Kamran, Vesterbro. The Farsi set is used when the language is Farsi, the English set otherwise.
+5.2 Settings → Connection
+Port range → “All 13 CF ports”. This makes every generated config include all Cloudflare edge ports:
+Plain (no TLS): 80, 8080, 8880, 2052, 2082, 2086, 2095
+TLS: 443, 8443, 2053, 2083, 2087, 2096 Use “Inbound ports only” only if you deliberately want to limit the port list.
+Important — *.workers.dev vs custom domain: a *.workers.dev hostname only serves ports 80 and 443. If the config points at the workers.dev host, the panel automatically drops the other 11 ports, so it never emits nodes that can’t connect. To use the full 13-port set, put the Worker on a custom domain.
+5.3 Settings → Xray bridge
+Only needed for VMess / Shadowsocks. Set it to your Xray WebSocket server URL, and export the matching server config with GET /api/xray/export (log in first, then open that path in the browser). VLESS and Trojan work without this.
+
+5.4 Inbounds
+The panel ships four inbounds, each with its own, different public ProxyIP:
+
+Inbound	Protocol	Default ProxyIP
+VLESS Edge	vless	pyip.ygkkk.dpdns.org
+VMess Edge	vmess	proxyip.cmliussss.net
+Trojan Edge	trojan	proxyip.us.fxxk.dedyn.io
+Shadowsocks Edge	shadowsocks	proxyip.hk.fxxk.dedyn.io
+Best practice: keep a ProxyIP on every inbound you actually use. It is what lets the Worker reach Cloudflare-hosted destinations (X, ChatGPT, many CDNs). Replace the public ones with your own relay if you have one (see yonggekkk’s x-ui-yg / sing-box-yg).
+New inbounds you create start with an empty ProxyIP — set one if that inbound needs it.
+Use 2–4 ports per inbound; TLS ports for TLS, plain ports for non-TLS.
+5.5 Clean IPs
+Add the Cloudflare anycast IPs / preferred domains as IP#Name (one per line, Options: Clean IPs → + Add IPs). Good starting set:
+
+Step 104
+16.0.0#CF-A
+Step 104
+17.0.0#CF-B
+Step 104
+18.0.0#CF-C
+Step 104
+19.0.0#CF-D
+Step 172
+66.0.0#CF-E
+Step 172
+67.0.0#CF-F
+Then in a client, tick only the clean IPs with the best latency for that user — that is the whole point of per-client clean-IP selection.
+
+5.6 Clients
+Ports: leave all selected unless you need to restrict a client.
+Clean IPs: none selected = the Worker host only; tick the ones that client should use.
+Traffic limit (0 = unlimited), Expiration, Maximum IPs — set per user.
+Copy the client’s Clash / sing-box / generic subscription from the client’s Config dialog.
+5.7 Outbounds
+Keep the single DIRECT outbound for the simplest, fastest setup. Add a SOCKS5 or HTTP CONNECT outbound only if you route egress through another server, then attach it to an inbound.
+
+5.8 Admins (least privilege)
+Create limited admins and grant only the sections they need. Each permission unlocks one section:
+
+
+Permission	Unlocks
+view	Overview (always visible)
+createInbound / editInbound / deleteInbound	Inbounds
+manageOutbounds	Outbounds
+createClient / editClient / deleteClient	Clients
+manageAdmins	Admins
+manageCleanIPs	Clean IPs
+manageSettings	Settings — advanced sections
+viewLogs	Logs
+An admin only sees the sections they were granted. Permission changes apply on their next login.
+
+Every admin can open Settings → My account to change their own display name and password (this needs no special permission). The other Settings sections (Panel Settings, Xray bridge, Connection, Appearance) require manageSettings.
+
+5.9 Confirm you are on the latest build
+After deploying, check the sidebar — it shows VPN MANAGEMENT · v2026.09.18. If you don’t see a version, or Settings doesn’t start with My account, the new file didn’t go live: redeploy worker.js and hard-refresh (Ctrl+F5).
+
+6. Connecting a client
+In Clients, open a client → Config.
+Copy the subscription URL (/sub/<token>) or the specific format:
+/sub/<token>/cl → Clash-meta
+/sub/<token>/sb → sing-box
+/sub/<token>/ty (or /raw) → generic base64 (v2rayN / v2rayNG / NekoBox)
+Import it in your client. Recommended clients: v2rayN / v2rayNG, sing-box, Clash/Mihomo, Karing, Hiddify, Streisand, Shadowrocket.
+Tip: if TLS nodes don’t connect because the domain is blocked by your ISP, enable Fragment in the client. The non-TLS (80-series) nodes on *.workers.dev often work without any extra setting.
+
+7. Troubleshooting
+
+Symptom	Fix
+D1 binding IOT_DB is missing	The D1 binding name is wrong or missing → set it to IOT_DB.
+Upload works, download doesn’t / pages never load	The destination is Cloudflare-hosted and the Worker can’t reach it directly → set a ProxyIP on that inbound (Inbounds → edit).
+Node pings fine but nothing loads (DNS fails)	Fixed: VLESS UDP/DNS is now proxied over DNS-over-HTTPS. Also make sure your client isn’t forcing a UDP-only DNS server that the tunnel can’t carry.
+VMess / Shadowsocks don’t connect	They need the Xray bridge — set it in Settings → Xray bridge. Use VLESS/Trojan meanwhile.
+TLS nodes fail, plain work (or vice-versa)	TLS works on the 443-series ports; plain on the 80-series. On a custom domain only TLS is guaranteed.
+Panel feels slow on first load	That is the D1 cold start; it is cached after the first request (schema-version fast path).
+Most nodes fail / “no clear server address”	Each node name now shows the endpoint (… 104.16.0.1:443 TLS). On a *.workers.dev host only ports 80/443 work — the panel auto-drops the rest; use a custom domain for all 13 ports.
+A limited admin sees no sections	Grant the matching permissions and have them log in again.
+Forgot the owner password	In D1 run: UPDATE admins SET password_hash='<sha256-of-new-password>' WHERE username='dollax26';
+8. Notes
+Everything (inbounds, clients, clean IPs, settings, admins, logs) lives in D1; back it up with wrangler d1 export.
+The panel plus public ProxyIPs are a convenience — for serious use, self-host your own ProxyIP and clean IPs to avoid shared/rate-limited relays.
+Use this only on infrastructure and traffic you are authorised to manage, and respect the laws that apply to you.
