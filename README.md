@@ -1,5 +1,5 @@
 # dollax26
-Cloudflare Worker VPN Panel — full build
+Cloudflare Worker Dollax26 Panel — full build
 
 Files
 
