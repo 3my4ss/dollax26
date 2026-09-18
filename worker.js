@@ -1,4 +1,4 @@
-﻿import { connect } from "cloudflare:sockets";
+import { connect } from "cloudflare:sockets";
 
 /*
   dollax26
@@ -2528,11 +2528,11 @@ function renderSettings() {
 
   document.getElementById("page").innerHTML =
     '<div class="grid2">' +
-    '<div class="panel"><div class="panel-head"><div class="panel-title">Panel Settings</div></div><div class="panel-body"><div class="form-grid"><div class="field"><label>Panel name</label><input id="spName" value="' + esc(d.panelName || "dollax26") + '"></div><div class="field"><label>Public host</label><input id="spHost" value="' + esc(d.publicHost || "") + '"></div><div class="field"><label>Username</label><input id="spUser" value="' + esc(d.username || "dollax26") + '"></div><div class="field"><label>New password</label><input id="spPass" type="password"></div></div><div class="action-row" style="margin-top:12px"><button class="btn primary" id="saveSettings">Save settings</button></div></div></div>' +
+    '<div class="panel"><div class="panel-head"><div class="panel-title">Panel Settings</div></div><div class="panel-body"><div class="form-grid"><div class="field"><label>Public host</label><input id="spHost" value="' + esc(d.publicHost || "") + '"></div><div class="field"><label>Username</label><input id="spUser" value="' + esc(d.username || "dollax26") + '"></div><div class="field"><label>New password</label><input id="spPass" type="password"></div></div><div class="action-row" style="margin-top:12px"><button class="btn primary" id="saveSettings">Save settings</button></div></div></div>' +
     '<div class="panel"><div class="panel-head"><div class="panel-title">Xray bridge</div></div><div class="panel-body"><div class="field"><label>Xray WebSocket origin</label><input id="spXray" value="' + esc(d.xrayOrigin || "") + '" placeholder="https://xray.example.com"></div><div style="height:10px"></div><div class="notice">VMess and Shadowsocks use this bridge. The Xray server must have matching paths and client credentials.</div></div></div>' +
     '</div>' +
     '<div style="height:12px"></div>' +
-    '<div class="panel"><div class="panel-head"><div class="panel-title">Cloudflare ports</div></div><div class="panel-body"><div class="notice">' + esc((d.cloudflarePorts || []).join(", ")) + '</div></div></div>';
+    '</div>';
 
   document.getElementById("saveSettings").onclick = async function () {
     try {
@@ -2540,7 +2540,7 @@ function renderSettings() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          panelName: document.getElementById("spName").value,
+          
           publicHost: document.getElementById("spHost").value,
           username: document.getElementById("spUser").value,
           password: document.getElementById("spPass").value,
@@ -3400,9 +3400,7 @@ async function apiHandler(req, env, ctx) {
 
     const body = await req.json();
 
-    if (body.panelName != null) {
-      await setSetting(env, "panel_name", String(body.panelName).trim() || PANEL_DEFAULT);
-    }
+    
 
     if (body.publicHost != null) {
       await setSetting(env, "public_host", hostOnly(body.publicHost));
