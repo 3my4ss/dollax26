@@ -1,4 +1,4 @@
-Cloudflare Worker VPN Panel — Deployment Guide (English)
+Cloudflare Worker Dollax26 Panel — Deployment Guide (English)
 A self-contained Cloudflare Worker VPN panel that manages VLESS / VMess / Trojan (and Shadowsocks) inbounds, clients, clean IPs, per-inbound ProxyIP, subscriptions and admin permissions — all stored in a single D1 database.
 
 Storage: one D1 database bound as IOT_DB.
