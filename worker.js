@@ -1,4 +1,4 @@
-import { connect } from "cloudflare:sockets";
+﻿import { connect } from "cloudflare:sockets";
 
 /*
   dollax26
@@ -1648,6 +1648,31 @@ th{background:#0f1724;color:#8496af;text-transform:uppercase;letter-spacing:1px;
 @media(max-width:1000px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}}
 @media(max-width:700px){.sidebar{width:72px;flex-basis:72px}.brand-text,.nav-text,.logout-text{display:none}.brand{justify-content:center;padding:16px 0}.nav button{justify-content:center;padding:0}.nav-icon{margin:0}.content{padding:12px}.form-grid,.port-grid{grid-template-columns:1fr}}
 </style>
+<style>
+.navIcon,
+.nav-icon {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:30px;
+  min-width:30px;
+  height:24px;
+  margin-right:7px;
+  border:1px solid #34445a;
+  border-radius:6px;
+  color:#8fa5bf;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.3px;
+}
+
+.nav button.active .navIcon,
+.nav button.active .nav-icon {
+  border-color:#1d8269;
+  color:#3bd6ab;
+  background:#103a31;
+}
+</style>
 </head>
 
 <body>
@@ -1656,7 +1681,7 @@ th{background:#0f1724;color:#8496af;text-transform:uppercase;letter-spacing:1px;
   <div class="modal-box">
     <div class="modal-head">
       <div class="modal-title" id="modalTitle">Dialog</div>
-      <button class="close" id="modalClose">×</button>
+      <button class="close" id="modalClose">Ã—</button>
     </div>
     <div id="modalBody"></div>
   </div>
@@ -1787,14 +1812,14 @@ function shell() {
     '</div>' +
     '</div>' +
     '<nav class="nav">' +
-    '<button data-p="overview" class="active"><span class="nav-icon">◉</span><span class="nav-text">Overview</span></button>' +
-    '<button data-p="inbounds"><span class="nav-icon">⇄</span><span class="nav-text">Inbounds</span></button>' +
-    '<button data-p="outbounds"><span class="nav-icon">→</span><span class="nav-text">Outbounds</span></button>' +
-    '<button data-p="clients"><span class="nav-icon">♙</span><span class="nav-text">Clients</span></button>' +
-    '<button data-p="admins"><span class="nav-icon">⚑</span><span class="nav-text">Admins</span></button>' +
-    '<button data-p="cleanips"><span class="nav-icon">✦</span><span class="nav-text">Clean IPs</span></button>' +
-    '<button data-p="settings"><span class="nav-icon">⚙</span><span class="nav-text">Settings</span></button>' +
-    '<button data-p="logs"><span class="nav-icon">≡</span><span class="nav-text">Logs</span></button>' +
+    '<button data-p="overview" class="active"><span class="nav-icon">â—‰</span><span class="nav-text">Overview</span></button>' +
+    '<button data-p="inbounds"><span class="nav-icon">â‡„</span><span class="nav-text">Inbounds</span></button>' +
+    '<button data-p="outbounds"><span class="nav-icon">â†’</span><span class="nav-text">Outbounds</span></button>' +
+    '<button data-p="clients"><span class="nav-icon">â™™</span><span class="nav-text">Clients</span></button>' +
+    '<button data-p="admins"><span class="nav-icon">âš‘</span><span class="nav-text">Admins</span></button>' +
+    '<button data-p="cleanips"><span class="nav-icon">âœ¦</span><span class="nav-text">Clean IPs</span></button>' +
+    '<button data-p="settings"><span class="nav-icon">âš™</span><span class="nav-text">Settings</span></button>' +
+    '<button data-p="logs"><span class="nav-icon">â‰¡</span><span class="nav-text">Logs</span></button>' +
     '</nav>' +
     '<div class="side-foot">' +
     '<button class="logout" id="logout"><span class="logout-text">Logout</span></button>' +
@@ -1805,7 +1830,7 @@ function shell() {
     '<div class="top-title" id="title">Overview</div>' +
     '<div class="top-right">' +
     '<span class="pill" id="colo">EDGE</span>' +
-    '<span class="pill ok">● Running</span>' +
+    '<span class="pill ok">â— Running</span>' +
     '</div>' +
     '</header>' +
     '<div class="content">' +
@@ -1893,11 +1918,11 @@ function renderOverview() {
     '<div class="card"><div class="card-label">Clients</div><div class="card-value">' + S.clients.length + '</div><div class="card-sub">' + S.clients.filter(x => x.enabled).length + ' enabled</div></div>' +
     '<div class="card"><div class="card-label">Inbounds</div><div class="card-value">' + S.inbounds.length + '</div><div class="card-sub">' + S.inbounds.filter(x => x.enabled).length + ' active</div></div>' +
     '<div class="card"><div class="card-label">Outbounds</div><div class="card-value">' + S.outbounds.length + '</div><div class="card-sub">' + S.outbounds.filter(x => x.enabled).length + ' active</div></div>' +
-    '<div class="card"><div class="card-label">Traffic</div><div class="card-value">' + bytes(traffic.up + traffic.down) + '</div><div class="card-sub">Upload ' + bytes(traffic.up) + ' · Download ' + bytes(traffic.down) + '</div></div>' +
+    '<div class="card"><div class="card-label">Traffic</div><div class="card-value">' + bytes(traffic.up + traffic.down) + '</div><div class="card-sub">Upload ' + bytes(traffic.up) + ' Â· Download ' + bytes(traffic.down) + '</div></div>' +
     '</div>' +
     '<div class="grid2">' +
     '<div class="panel"><div class="panel-head"><div class="panel-title">Gateway</div><button class="btn" id="refresh">Refresh</button></div><div class="panel-body"><div class="info-grid"><div class="info"><div class="info-label">Panel</div><div class="info-value">' + esc(S.settings.panelName) + '</div></div><div class="info"><div class="info-label">Public Host</div><div class="info-value">' + esc(S.settings.publicHost || location.host) + '</div></div><div class="info"><div class="info-label">Clean IPs</div><div class="info-value">' + S.ips.filter(x => x.enabled).length + ' active</div></div><div class="info"><div class="info-label">Xray Bridge</div><div class="info-value">' + (S.settings.xrayOrigin ? "Configured" : "Not configured") + '</div></div></div><div style="height:12px"></div><div class="notice">Client traffic can be routed through DIRECT or the configured SOCKS5 Germany outbound. VMess and Shadowsocks use the configured Xray WebSocket bridge.</div></div></div>' +
-    '<div class="panel"><div class="panel-head"><div class="panel-title">Latency</div><button class="btn" id="ping">Test</button></div><div class="panel-body"><div class="card-value" id="lat" style="font-size:26px">—</div><div class="card-sub">Worker response</div></div></div>' +
+    '<div class="panel"><div class="panel-head"><div class="panel-title">Latency</div><button class="btn" id="ping">Test</button></div><div class="panel-body"><div class="card-value" id="lat" style="font-size:26px">â€”</div><div class="card-sub">Worker response</div></div></div>' +
     '</div>' +
     '<div style="height:12px"></div>' +
     '<div class="panel"><div class="panel-head"><div class="panel-title">Recent Clients</div><button class="btn" id="clients">Open</button></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Protocol</th><th>Inbound</th><th>Outbound</th><th>Traffic</th><th>Status</th></tr></thead><tbody>' +
@@ -1921,7 +1946,7 @@ function renderOverview() {
     document.getElementById("lat").textContent = Math.round(performance.now() - t) + " ms";
   };
 
-  document.getElementById("colo").textContent = (S.settings.colo || "EDGE") + (S.settings.country ? " · " + S.settings.country : "");
+  document.getElementById("colo").textContent = (S.settings.colo || "EDGE") + (S.settings.country ? " Â· " + S.settings.country : "");
 }
 
 function portChecks(selected, tls) {
@@ -1950,8 +1975,8 @@ async function renderInbounds() {
       '<td>' + ports.map(function (p) { return p + (tls.indexOf(p) >= 0 ? " TLS" : ""); }).join(", ") + '</td>' +
       '<td>' + esc(x.path) + '</td>' +
       '<td>' + esc(x.outbound_name || "-") + '</td>' +
-      '<td>' + (Number(x.max_clients || 0) ? x.max_clients : "∞") + '</td>' +
-      '<td>' + (Number(x.traffic_limit || 0) ? bytes(x.traffic_limit) : "∞") + '</td>' +
+      '<td>' + (Number(x.max_clients || 0) ? x.max_clients : "âˆž") + '</td>' +
+      '<td>' + (Number(x.traffic_limit || 0) ? bytes(x.traffic_limit) : "âˆž") + '</td>' +
       '<td><span class="badge ' + (x.enabled ? "ok" : "off") + '">' + (x.enabled ? "Enabled" : "Disabled") + '</span></td>' +
       '<td>' +
       '<div class="action-row">' +
@@ -2015,7 +2040,7 @@ async function inboundModal(item) {
     '<div class="form-grid" style="margin-top:11px">' +
     '<div class="field"><label>WebSocket path</label><input id="inPath" value="' + esc(edit ? item.path : "/ws/" + Math.random().toString(36).slice(2, 10)) + '"></div>' +
     '<div class="field"><label>Outbound</label><select id="inOutbound">' + (out.items || []).map(function (x) {
-      return '<option value="' + x.id + '" ' + (edit && x.id === item.outbound_id ? "selected" : "") + '>' + esc(x.name) + " · " + esc(x.type) + '</option>';
+      return '<option value="' + x.id + '" ' + (edit && x.id === item.outbound_id ? "selected" : "") + '>' + esc(x.name) + " Â· " + esc(x.type) + '</option>';
     }).join("") + '</select></div>' +
     '<div class="field"><label>Inbound traffic limit GB</label><input id="inLimit" type="number" min="0" step="0.1" value="' + (edit ? (Number(item.traffic_limit || 0) / 1073741824).toFixed(2) : "0") + '"></div>' +
     '<div class="field"><label>Maximum clients</label><input id="inMax" type="number" min="0" value="' + (edit ? item.max_clients || 0 : 0) + '"></div>' +
@@ -2174,7 +2199,7 @@ function renderClients() {
       '<td style="min-width:155px">' + bytes(Number(x.up || 0) + Number(x.down || 0)) + (Number(x.quota || 0) ? " / " + bytes(x.quota) : "") +
       '<div class="progress"><i style="width:' + p + '%"></i></div>' +
       '</td>' +
-      '<td>' + (d === null ? "∞" : d + " days") + '</td>' +
+      '<td>' + (d === null ? "âˆž" : d + " days") + '</td>' +
       '<td><span class="badge ' + (x.enabled ? "ok" : "off") + '">' + (x.enabled ? "Enabled" : "Disabled") + '</span></td>' +
       '<td>' +
       '<div class="action-row">' +
@@ -2228,11 +2253,11 @@ function renderClients() {
 function clientModal(item) {
   var edit = !!item;
   var io = S.inbounds.filter(x => x.enabled).map(function (x) {
-    return '<option value="' + x.id + '" ' + (edit && item.inbound_id === x.id ? "selected" : "") + '>' + esc(x.name) + " · " + esc(x.protocol) + '</option>';
+    return '<option value="' + x.id + '" ' + (edit && item.inbound_id === x.id ? "selected" : "") + '>' + esc(x.name) + " Â· " + esc(x.protocol) + '</option>';
   }).join("");
 
   var oo = S.outbounds.filter(x => x.enabled).map(function (x) {
-    return '<option value="' + x.id + '" ' + (edit && item.outbound_id === x.id ? "selected" : "") + '>' + esc(x.name) + " · " + esc(x.type) + '</option>';
+    return '<option value="' + x.id + '" ' + (edit && item.outbound_id === x.id ? "selected" : "") + '>' + esc(x.name) + " Â· " + esc(x.type) + '</option>';
   }).join("");
 
   var expiry = edit && Number(item.expiry || 0) ? new Date(Number(item.expiry)).toISOString().slice(0, 16) : "";
@@ -2284,8 +2309,8 @@ async function clientConfig(id) {
   openModal("Client configuration",
     '<div class="sub-stats">' +
     '<div class="stat"><b>' + bytes(d.used) + '</b><span>Used</span></div>' +
-    '<div class="stat"><b>' + (d.quota ? bytes(remaining) : "∞") + '</b><span>Remaining</span></div>' +
-    '<div class="stat"><b>' + (d.daysLeft === null ? "∞" : d.daysLeft) + '</b><span>Days left</span></div>' +
+    '<div class="stat"><b>' + (d.quota ? bytes(remaining) : "âˆž") + '</b><span>Remaining</span></div>' +
+    '<div class="stat"><b>' + (d.daysLeft === null ? "âˆž" : d.daysLeft) + '</b><span>Days left</span></div>' +
     '</div>' +
     '<div style="height:14px"></div>' +
     '<div style="display:grid;grid-template-columns:180px 1fr;gap:15px;align-items:center">' +
@@ -2306,7 +2331,7 @@ async function clientConfig(id) {
     '<div style="height:15px"></div>' +
     '<div class="info-label">Configuration nodes</div>' +
     (d.nodes && d.nodes.length ? d.nodes.map(function (n) {
-      return '<div class="node"><div class="node-top"><strong>' + esc(n.protocol.toUpperCase()) + ' · ' + n.port + '</strong><span>' + (n.tls ? 'TLS' : 'NO TLS') + '</span></div><div class="node-meta">' + esc(n.addressLabel || n.address) + '</div><div class="link-box" style="margin-top:8px">' + esc(n.link) + '</div><div class="action-row" style="margin-top:8px"><button class="btn small copyNode" data-link="' + encodeURIComponent(n.link) + '">Copy</button></div></div>';
+      return '<div class="node"><div class="node-top"><strong>' + esc(n.protocol.toUpperCase()) + ' Â· ' + n.port + '</strong><span>' + (n.tls ? 'TLS' : 'NO TLS') + '</span></div><div class="node-meta">' + esc(n.addressLabel || n.address) + '</div><div class="link-box" style="margin-top:8px">' + esc(n.link) + '</div><div class="action-row" style="margin-top:8px"><button class="btn small copyNode" data-link="' + encodeURIComponent(n.link) + '">Copy</button></div></div>';
     }).join("") : '<div class="empty">No generated nodes</div>')
   );
 
@@ -2986,7 +3011,7 @@ async function apiHandler(req, env, ctx) {
         "INSERT INTO clients(" +
           "id,inbound_id,outbound_id,name,uuid,password,enabled,up,down,created," +
           "quota,expiry,limit_ip,sub_token,email,comment" +
-          ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+          ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
       )
       .bind(
         cid,
@@ -3556,6 +3581,31 @@ button:hover{background:#243246}
 .footer{text-align:center;margin-top:14px;font-size:8px;color:#70819b}
 @media(max-width:720px){.grid{grid-template-columns:1fr}.donut{width:180px;height:180px}.stats{grid-template-columns:repeat(3,1fr)}}
 </style>
+<style>
+.navIcon,
+.nav-icon {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:30px;
+  min-width:30px;
+  height:24px;
+  margin-right:7px;
+  border:1px solid #34445a;
+  border-radius:6px;
+  color:#8fa5bf;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.3px;
+}
+
+.nav button.active .navIcon,
+.nav button.active .nav-icon {
+  border-color:#1d8269;
+  color:#3bd6ab;
+  background:#103a31;
+}
+</style>
 </head>
 
 <body>
@@ -3592,7 +3642,7 @@ button:hover{background:#243246}
       <div class="stats">
         <div class="stat"><b>${bytes(data.used)}</b><span>Used</span></div>
         <div class="stat"><b>${data.quota ? bytes(Math.max(0, data.quota - data.used)) : "Unlimited"}</b><span>Remaining</span></div>
-        <div class="stat"><b>${data.daysLeft === null ? "∞" : data.daysLeft}</b><span>Days left</span></div>
+        <div class="stat"><b>${data.daysLeft === null ? "âˆž" : data.daysLeft}</b><span>Days left</span></div>
       </div>
 
       <div style="height:13px"></div>
@@ -3649,7 +3699,7 @@ const nodes = document.getElementById("nodes");
   div.className = "node";
 
   div.innerHTML =
-    '<div class="node-top"><strong>' + n.protocol.toUpperCase() + ' · ' + n.port + '</strong><span>' + (n.tls ? 'TLS' : 'NO TLS') + '</span></div>' +
+    '<div class="node-top"><strong>' + n.protocol.toUpperCase() + ' Â· ' + n.port + '</strong><span>' + (n.tls ? 'TLS' : 'NO TLS') + '</span></div>' +
     '<div class="node-meta">' + (n.addressLabel || n.address) + '</div>' +
     '<div class="link">' + n.link + '</div>' +
     '<div class="actions"><button>Copy configuration</button></div>';
@@ -3792,3 +3842,6 @@ export default {
     }
   }
 };
+
+
+
